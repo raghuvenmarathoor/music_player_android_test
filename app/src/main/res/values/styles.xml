@@ -1,0 +1,37 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+
+        <!--<item name="android:actionBarStyle">@style/myActionBar</item>-->
+        <item name="colorPrimary">@color/Orange</item>
+        <!--<item name="actionBarStyle">@style/MyActionBar</item>-->
+        <!--<item name="titleTextStyle">@color/Black</item>-->
+        <!--<item name="actionMenuTextColor">@color/Black</item>-->
+
+        <!--<item name="android:actionBarTabBarStyle">@color/Orange</item>-->
+       <!-- <item name="android:background">@drawable/music_thinking</item> -->
+    </style>
+    <style name="myStyledActionBar" parent = "TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="titleTextStyle">@color/Black</item>
+        <item name="android:textColor">@color/Black</item>
+        <item name="actionBarTabTextStyle">@color/Black</item>
+        <item name="actionMenuTextColor">@color/Black</item>
+    </style>
+
+    <!--<style name="myActionBar" parent="@style/">-->
+        <!--<item name="android:background">@color/Pink</item>-->
+    <!--</style>-->
+
+    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:displayOptions">showTitle</item>
+        <item name="background">@color/LightCyan</item>
+        <!--<item name="android:colorBackground">@color/LightCyan</item>-->
+        <item name="titleTextStyle">@style/MyActionBarTitleText</item>
+    </style>
+
+    <style name="MyActionBarTitleText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/Blue</item>
+    </style>
+</resources>

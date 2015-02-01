@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight = "100"
+    android:clickable="true"
+    android:onClick="songPicked"
+    android:orientation="vertical"
+    android:padding="@dimen/abc_control_padding_material"
+    card_view:cardBackgroundColor="@color/DodgerBlue"
+    >
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/White"
+            android:id="@+id/song_id"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/White"
+            android:layout_below="@id/song_id"
+            android:id="@+id/song_title"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/White"
+            android:id="@+id/song_artist"
+            android:layout_below = "@id/song_title"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/White"
+            android:layout_below="@id/song_artist"
+            android:id="@+id/song_info"/>
+
+        </RelativeLayout>
+</android.support.v7.widget.CardView>

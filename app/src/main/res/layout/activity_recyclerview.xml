@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation = "vertical"
+    android:background = "@color/White"
+    tools:context="com.example.raghu.recyclerviewtest.Recyclerview">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/White"
+        ></android.support.v7.widget.Toolbar>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity= "center_horizontal"
+        android:id ="@+id/playerLayout"
+        android:background="@color/White"
+        android:orientation="horizontal">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id = "@+id/previous_button"
+            android:background="@color/Transparent"
+            android:onClick = "onButtonClicked"
+            android:src = "@drawable/ic_av_skip_previous_edit"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick = "onButtonClicked"
+            android:id = "@+id/play_pause_button"
+            android:background="@color/Transparent"
+            android:src = "@drawable/ic_av_play_arrow_edit"/>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id = "@+id/next_button"
+            android:onClick = "onButtonClicked"
+            android:background="@color/Transparent"
+            android:src ="@drawable/ic_av_skip_next_edit"/>
+    </LinearLayout>
+    </RelativeLayout>
+    <!--<ScrollingTabContainerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ScrollingTabContainerView>-->
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_above = "@id/playerLayout"
+    android:id = "@+id/fragment_layout"/>
+
+
+</LinearLayout>
