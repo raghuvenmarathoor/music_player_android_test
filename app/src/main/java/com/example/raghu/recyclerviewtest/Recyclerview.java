@@ -16,6 +16,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,7 +40,9 @@ import java.util.List;
 import java.util.Set;
 
 
-public class Recyclerview extends ActionBarActivity implements SongFragment.OnFragmentInteractionListener, MediaController.MediaPlayerControl {
+
+public class Recyclerview extends ActionBarActivity implements SongFragment.OnFragmentInteractionListener
+        , MediaController.MediaPlayerControl, SampleFragment.OnFragmentInteractionListener {
 
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
@@ -48,39 +51,86 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     private Intent playIntent;
     private boolean musicBound=false;
     private static ArrayList<Song> songList;
+    private static Song currentSong;
     private String TAG= "MainActivity";
     private SpeechRecognizer mSpeechRecognizer;
     private Intent mSpeechRecognizerIntent;
     private boolean mIslistening;
     SongFragment fragment;
+    ViewPager viewPager;
+    boolean isRestarting = false;
+    int restartSongId = -1;
+    int restartSeekPosition = -1;
+    private MusicController controller;
+
+
+    public class MusicController extends MediaController {
+
+        public MusicController(Context c){
+            super(c);
+        }
+
+        public void hide(){}
+
+    }
+
+    private void setController(){
+        //set the controller up
+
+        controller = new MusicController(this);
+
+        controller.setPrevNextListeners(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playNext();
+            }
+        }, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playPrev();
+            }
+        });
+
+        controller.setMediaPlayer(this);
+        controller.setAnchorView(findViewById(R.id.recycler_list_view));
+        controller.setEnabled(true);
+    }
 
     @Override
     public void start() {
-
+        musicSrv.go();
     }
 
     @Override
     public void pause() {
-
+         musicSrv.pausePlayer();
     }
 
     @Override
     public int getDuration() {
-        return 0;
+
+        if(musicSrv!=null && musicBound && musicSrv.isPng())
+        return musicSrv.getDur();
+        else return 0;
+
     }
 
     @Override
     public int getCurrentPosition() {
-        return 0;
+        if(musicSrv!=null && musicBound && musicSrv.isPng())
+          return musicSrv.getPosn();
+        else return 0;
     }
 
     @Override
     public void seekTo(int pos) {
-
+       musicSrv.seekTo(pos);
     }
 
     @Override
     public boolean isPlaying() {
+        if(musicSrv!=null && musicBound)
+        return musicSrv.isPng();
         return false;
     }
 
@@ -91,17 +141,17 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
 
     @Override
     public boolean canPause() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canSeekBackward() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canSeekForward() {
-        return false;
+        return true;
     }
 
     /**
@@ -119,16 +169,26 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG,"Called on Create");
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_recyclerview);
         //Log.d(TAG,"setContentView");
 
-
+        songList = getSongList();
+        if (savedInstanceState != null) {
+            //Toast toast1 = Toast.makeText(this, "savedInstanceState not null", Toast.LENGTH_SHORT);
+            //toast1.show();
+            restartSongId = savedInstanceState.getInt("SONG_ID");
+            restartSeekPosition = savedInstanceState.getInt("SONG_POSITION");
+            isRestarting = true;
+            //Toast toast = Toast.makeText(this,"Restored songPostn:" + String.valueOf(restartSongId),Toast.LENGTH_SHORT);
+            //toast.show();
+            //musicSrv.setSongId(songId);
+            //musicSrv.seekTo(seekPosition);
+            //musicSrv.playSong();
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //getSupportActionBar().setIcon(R.drawable.ic_av_play_arrow);
-        getSupportActionBar().setIcon(R.drawable.ic_launcher);
-        //getSupportActionBar().setHideOnContentScrollEnabled(true);
         fragment = (SongFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_layout);
 
         if (fragment == null) {
@@ -140,7 +200,7 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.fragment_layout, fragment).commit();
         }
-
+        setController();
         mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -148,6 +208,17 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
                 this.getPackageName());
         mSpeechRecognizer.setRecognitionListener(new SpeechRecognitionListener(this));
+    }
+
+    private void playNext(){
+        musicSrv.next();
+        controller.show(0);
+    }
+
+    //play previous
+    private void playPrev(){
+        musicSrv.previous();
+        controller.show(0);
     }
 
     /**
@@ -173,6 +244,8 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     @Override
     protected void onRestart() {
         super.onRestart();
+
+
         Log.d(TAG,"onRestart");
     }
 
@@ -182,6 +255,8 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     @Override
     protected void onPause() {
         super.onPause();
+
+
         Log.d(TAG,"onPause");
     }
 
@@ -208,9 +283,20 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
             MusicService.MusicBinder binder = (MusicService.MusicBinder)service;
             //get service
             musicSrv = binder.getService();
+
             //pass list
             musicSrv.setList(songList);
             musicBound = true;
+            if (isRestarting = true) {
+                if (restartSongId != -1) {
+                    musicSrv.setSong(restartSongId);
+                    musicSrv.playSong();
+                    musicSrv.seekTo(restartSeekPosition);
+                    isRestarting = false;
+                }
+
+
+            }
         }
 
         @Override
@@ -226,6 +312,11 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
         }
+
+       /* Bundle bundle = new Bundle();
+        bundle.putInt("SONG_POSITION", musicSrv.getCursorPosition());
+        bundle.putInt("SONG_ID", musicSrv.getCurrentSongId());
+        super.onSaveInstanceState(bundle);*/
         Log.d(TAG,"onStart");
     }
     @Override
@@ -258,7 +349,54 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     @Override
     protected void onStop() {
         super.onStop();
+
         Log.d(TAG,"onStop");
+       /* Bundle bundle = new Bundle();
+        bundle.putInt("SONG_POSITION", musicSrv.getCursorPosition());
+        bundle.putInt("SONG_ID", musicSrv.getCurrentSongId());
+        super.onSaveInstanceState(bundle);*/
+    }
+
+    /**
+     * Save all appropriate fragment state.
+     *
+     * @param outState
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Log.d(TAG,"onSaveInstanceState");
+
+        //Bundle bundle = new Bundle();
+        outState.putInt("SONG_POSITION", musicSrv.getCursorPosition());
+        outState.putInt("SONG_ID", musicSrv.getSongPosn());
+        //Toast toast = Toast.makeText(this,"position saved:" + musicSrv.getSongPosn() + ":" + musicSrv.getCursorPosition() , Toast.LENGTH_SHORT);
+        //toast.show();
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * This method is called after {@link #onStart} when the activity is
+     * being re-initialized from a previously saved state, given here in
+     * <var>savedInstanceState</var>.  Most implementations will simply use {@link #onCreate}
+     * to restore their state, but it is sometimes convenient to do it here
+     * after all of the initialization has been done or to allow subclasses to
+     * decide whether to use your default implementation.  The default
+     * implementation of this method performs a restore of any view state that
+     * had previously been frozen by {@link #onSaveInstanceState}.
+     * <p/>
+     * <p>This method is called between {@link #onStart} and
+     * {@link #onPostCreate}.
+     *
+     * @param savedInstanceState the data most recently supplied in {@link #onSaveInstanceState}.
+     * @see #onCreate
+     * @see #onPostCreate
+     * @see #onResume
+     * @see #onSaveInstanceState
+     */
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(TAG,"onRestoreInstanceState");
     }
 
     public void onListenButtonClicked(View view) {
@@ -320,8 +458,12 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
 
     public void songPicked(View view){
         Log.e(TAG, "Song picked: " + ((TextView) view.findViewById(R.id.song_id)).getTag().toString());
-        musicSrv.setSong(Integer.parseInt(((TextView) view.findViewById(R.id.song_id)).getTag().toString()));
+        int sng = Integer.parseInt(((TextView) view.findViewById(R.id.song_id)).getTag().toString());
+        //Toast tst = Toast.makeText(this, String.valueOf(sng), Toast.LENGTH_SHORT);
+        //tst.show();
+        musicSrv.setSong(sng);
         musicSrv.playSong();
+
         /*try {
             this.wait(1000);
         } catch (InterruptedException e) {
@@ -359,7 +501,7 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
         }
     }
 
-    protected class SpeechRecognitionListener implements RecognitionListener
+       protected class SpeechRecognitionListener implements RecognitionListener
     {
         Context context;
         SpeechRecognitionListener(Context context) {

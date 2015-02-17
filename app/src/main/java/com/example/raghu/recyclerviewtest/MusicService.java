@@ -66,6 +66,17 @@ public class MusicService extends Service implements
         }
     }
 
+    public void setSongId(int songId) {
+        for (int i = 0; i< songs.size(); i++) {
+            Song song = songs.get(i);
+            int songIdFromSong = Integer.valueOf(song.getSongId());
+
+            if (songId == songIdFromSong ) {
+                setSong(i);
+            }
+        }
+    }
+
     /**
      * Called when the end of a media source is reached during playback.
      *
@@ -172,6 +183,10 @@ public class MusicService extends Service implements
         player.release();
         return false;
     }
+
+    public void resumeSong() {
+
+    }
     public void playSong(){
         player.reset();
         //get song
@@ -201,6 +216,54 @@ public class MusicService extends Service implements
     }
     public void setSong(int songIndex){
         songPosn=songIndex;
+    }
+    public int getCurrentSongId() {
+        return Integer.valueOf(songs.get(songPosn).getSongId());
+    }
+
+    public int getCursorPosition() {
+        if (player.isPlaying()) {
+            return player.getCurrentPosition();
+        } else {
+            return 0;
+        }
+
+    }
+
+    public int getSongPosn() {
+        return songPosn;
+    }
+    public void seekTo(int msec) {
+        if (player.isPlaying()) {
+            player.seekTo(msec);
+        } else {
+            Log.d(TAG, "seek to not worked");
+        }
+        player.seekTo(msec);
+    }
+
+    public int getPosn(){
+        return player.getCurrentPosition();
+    }
+
+    public int getDur(){
+        return player.getDuration();
+    }
+
+    public boolean isPng(){
+        return player.isPlaying();
+    }
+
+    public void pausePlayer(){
+        player.pause();
+    }
+
+    public void seek(int posn){
+        player.seekTo(posn);
+    }
+
+    public void go(){
+        player.start();
     }
 
 

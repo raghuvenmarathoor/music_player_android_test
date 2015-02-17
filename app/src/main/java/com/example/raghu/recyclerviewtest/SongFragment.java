@@ -51,6 +51,7 @@ public class SongFragment extends Fragment {
         SongFragment fragment = new SongFragment();
         fragment.setSongList(songs);
         fragment.setRetainInstance(true);
+        Log.e("SongFragment","new Instance");
         return fragment;
     }
 
