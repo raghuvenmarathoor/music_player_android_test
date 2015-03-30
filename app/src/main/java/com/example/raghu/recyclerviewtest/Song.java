@@ -4,16 +4,22 @@ package com.example.raghu.recyclerviewtest;
  * Created by Raghu on 21-01-2015.
  */
 public class Song {
-    public Song(String songId, String songTitle, String songArtist, String songInfo){
+    public Song(String songId, String songTitle, String songArtist, String songInfo, String albumArtPath){
         this.songId = songId;
         this.songTitle = songTitle;
         this.songArtist = songArtist;
         this.songInfo = songInfo;
+        this.albumArtPath = albumArtPath;
     }
     private String songId;
     private String songTitle;
     private String songArtist;
     private String songInfo;
+    private String albumArtPath;
+
+    public String getAlbumArtPath() {
+        return albumArtPath;
+    }
 
     public String getSongId() {
         return songId;

@@ -34,6 +34,7 @@ public class CardViewDataAdapter extends RecyclerView.Adapter<CardViewDataAdapte
         viewHolder.songTitle.setText(song.getSongTitle());
         viewHolder.songInfo.setText(song.getSongInfo());
         viewHolder.songId.setTag(i);
+        viewHolder.songAlbumArtInfo.setText(song.getAlbumArtPath());
 
     }
 
@@ -55,13 +56,14 @@ public class CardViewDataAdapter extends RecyclerView.Adapter<CardViewDataAdapte
      public TextView songArtist;
      public TextView songTitle;
      public TextView songInfo;
+     public TextView songAlbumArtInfo;
      public ViewHolder(View itemLayoutView) {
          super(itemLayoutView);
          songId = (TextView) itemLayoutView.findViewById(R.id.song_id);
          songArtist = (TextView) itemLayoutView.findViewById(R.id.song_artist);
          songTitle = (TextView) itemLayoutView.findViewById(R.id.song_title);
          songInfo = (TextView) itemLayoutView.findViewById(R.id.song_info);
-
+         songAlbumArtInfo = (TextView) itemLayoutView.findViewById(R.id.song_album_art);
      }
  }
 }

@@ -134,6 +134,13 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
         return false;
     }
 
+    public boolean isPaused() {
+        if(musicSrv!=null && musicBound)
+            return musicSrv.isPaused();
+        else
+            return false;
+    }
+
     @Override
     public int getBufferPercentage() {
         return 0;
@@ -402,7 +409,10 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
     public void onListenButtonClicked(View view) {
         if (!mIslistening)
         {
+            if (isPlaying())
+                pause();
             mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+
         }
     }
     @Override
@@ -419,15 +429,6 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
 
         super.onDestroy();
     }
-    public List<Song> generateRandomSongInfo() {
-        List<Song> songList = new ArrayList<Song>();
-        RandomString random = new RandomString(30);
-        for (int i = 0; i<30; i++){
-            Song song = new Song(random.nextString(),random.nextString(),random.nextString(),random.nextString());
-            songList.add(song);
-        }
-        return songList;
-    }
 
     private ArrayList<Song> getSongList() {
         ContentResolver musicResolver = getContentResolver();
@@ -442,13 +443,14 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
-            int bitmapColumn = musicCursor.getColumnIndex((MediaStore.Audio.Albums.ALBUM_ART));
+            int bitmapColumn = musicCursor.getColumnIndex((MediaStore.Audio.Albums.ALBUM));
             //add songs to list
             do {
                 long thisId = musicCursor.getLong(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
                 String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(String.valueOf(thisId), thisTitle, thisArtist, ""));
+                String thisAlbumArt = musicCursor.getString(bitmapColumn);
+                songList.add(new Song(String.valueOf(thisId), thisTitle, thisArtist, "", thisAlbumArt));
                 //songList.add(new Song(String.valueOf(thisId), thisTitle, thisArtist, ""),thisId);
             }
             while (musicCursor.moveToNext());
@@ -458,10 +460,11 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
 
     public void songPicked(View view){
         Log.e(TAG, "Song picked: " + ((TextView) view.findViewById(R.id.song_id)).getTag().toString());
-        int sng = Integer.parseInt(((TextView) view.findViewById(R.id.song_id)).getTag().toString());
+        String idString = ((TextView)view.findViewById(R.id.song_id)).getText().toString();
+        int sng = Integer.parseInt(idString);
         //Toast tst = Toast.makeText(this, String.valueOf(sng), Toast.LENGTH_SHORT);
         //tst.show();
-        musicSrv.setSong(sng);
+        musicSrv.setSongId(sng);
         musicSrv.playSong();
 
         /*try {
@@ -523,6 +526,9 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
         @Override
         public void onEndOfSpeech()
         {
+           // Toast tst = Toast.makeText(context,"endofSpeech: is paused " + String.valueOf(isPaused()), Toast.LENGTH_SHORT);
+            if (isPaused())
+                musicSrv.resume();
             Log.d(TAG, "onEndOfSpeech");
         }
 
@@ -563,11 +569,11 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
             Log.d(TAG, "onResults"); //$NON-NLS-1$
             ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             Log.d(TAG, "no of words :" + matches.size());
-            for (String song: matches) {
+            /*for (String song: matches) {
                 Log.d(TAG,song);
                 Toast toast =  Toast.makeText(context,song,Toast.LENGTH_SHORT);
                 toast.show();
-            }
+            }*/
             if (matches.size() > 0) {
                 String action = matches.get(0);
                 if (action.equals("play")) {
@@ -590,9 +596,17 @@ public class Recyclerview extends ActionBarActivity implements SongFragment.OnFr
                     fragment.setFilter(filter);
                 }
             }
+
+
+            if (isPaused())
+                musicSrv.resume();
+
+            Toast tst = Toast.makeText(context,"endofSpeech: is paused " + String.valueOf(isPaused()), Toast.LENGTH_SHORT);
+            tst.show();
             // matches are the return values of speech recognition engine
             // Use these values for whatever you wish to do
         }
+
 
         @Override
         public void onRmsChanged(float rmsdB)

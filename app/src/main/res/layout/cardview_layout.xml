@@ -40,6 +40,12 @@
             android:textColor="@color/White"
             android:layout_below="@id/song_artist"
             android:id="@+id/song_info"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/White"
+            android:layout_below="@id/song_info"
+            android:id="@+id/song_album_art"/>
 
         </RelativeLayout>
 </android.support.v7.widget.CardView>
