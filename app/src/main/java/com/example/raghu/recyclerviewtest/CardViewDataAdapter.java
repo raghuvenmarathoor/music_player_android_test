@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,7 +20,7 @@ public class CardViewDataAdapter extends RecyclerView.Adapter<CardViewDataAdapte
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View itemLayoutView = LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.cardview_layout, null);
+                R.layout.songview_layout, null);
         ViewHolder viewHolder = new ViewHolder(itemLayoutView);
         return viewHolder;
     }
